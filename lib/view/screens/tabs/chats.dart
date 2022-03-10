@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ChatsTab extends StatelessWidget {
@@ -6,6 +7,9 @@ class ChatsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: (){
+        FirebaseFirestore.instance.collection('chats/OaNNkLkRDvkUuFNijAUj/messages').snapshots().listen((event) { print(event.docs[0]['text']); });
+      },child: const Icon(Icons.add,size: 32,),),
       body: ListView.builder(
           itemCount: 55,
           itemBuilder: (ctx, index) {
