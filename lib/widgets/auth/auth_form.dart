@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:whatsapp/widgets/user_image_picker.dart';
 
 class AuthFormWidget extends StatefulWidget {
   const AuthFormWidget({Key? key,required this.submitFn,required this.isLoading}) : super(key: key);
   final bool isLoading;
-  final void Function(String? emailAddress,String? userName, String? password, bool isLogin, BuildContext ctx) submitFn;
+  final void Function(String? emailAddress,String? userName, String? password, File? userImage , bool isLogin, BuildContext ctx) submitFn;
 
   @override
   State<AuthFormWidget> createState() => _AuthFormWidgetState();
@@ -16,14 +19,21 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
   String? _userName = '';
   String? _password = '';
   bool _obscureText = true;
+  File? _pickedImage;
+  imagePickerFunction(pickedImage){
+    _pickedImage = pickedImage;
+  }
 
   void submitData() {
     var isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
-
     if (isValid) {
       _formKey.currentState!.save();
-      widget.submitFn(_emailAddress,_userName,_password,_isLogin,context);
+      if(_pickedImage == null && !_isLogin){
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select your image')));
+        return;
+      }
+      widget.submitFn(_emailAddress,_userName,_password,_pickedImage,_isLogin,context);
     }
   }
 
@@ -53,6 +63,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                   const SizedBox(
                     height: 24,
                   ),
+                  if(!_isLogin)
+                  UserImagePicker(imageValidation: imagePickerFunction,),
                   TextFormField(
                     key: const ValueKey('email'),
                     validator: (value) {
@@ -148,7 +160,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                       });
                     },
                     child: Text(_isLogin
-                        ? 'New here? Create account'
+                        ? 'New here? Create an account'
                         : 'Already have an account'),
                   ),
                 ],

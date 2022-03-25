@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/view/screens/tabs/calls.dart';
 import 'package:whatsapp/view/screens/tabs/camera.dart';
@@ -27,6 +28,24 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   void dispose() {
     super.dispose();
     _controller.dispose();
+  }
+
+  popupMenuHandleClick(item) async {
+    switch (item) {
+      case 'logout':
+        try {
+          await FirebaseAuth.instance.signOut();
+        } catch (e) {
+          print(e);
+        }
+        break;
+      case 'setting':
+        print('Setting');
+        break;
+      default:
+        print('Wrong switch case handling');
+        break;
+    }
   }
 
   @override
@@ -67,11 +86,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 const SizedBox(
                   width: 10,
                 ),
-                InkWell(
-                  onTap: () {
-                    print('option');
+                PopupMenuButton(
+                  onSelected: (item) {
+                    popupMenuHandleClick(item);
                   },
-                  child: const Icon(Icons.more_vert),
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(value: 'logout', child: Text('Logout')),
+                    const PopupMenuItem(value: 'setting', child: Text('Settings')),
+                  ],
                 ),
               ],
             )
